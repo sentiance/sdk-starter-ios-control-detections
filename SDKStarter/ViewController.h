@@ -14,9 +14,11 @@
 }
 
 @property (strong, nonatomic) IBOutlet UIButton *startstopButton;
+@property (strong, nonatomic) IBOutlet UIButton *startstopTripButton;
 @property (weak, nonatomic) IBOutlet UITableView *pInfoTableview;
 
 - (IBAction)startStopDetectionsTapped:(id)sender;
+- (IBAction)startStopTripTapped:(id)sender;
 
 @end
 

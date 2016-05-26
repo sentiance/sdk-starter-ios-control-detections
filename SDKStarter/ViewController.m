@@ -34,6 +34,31 @@
             [self.startstopButton setTitle:@"Start Detections" forState:UIControlStateNormal];
             [self.startstopButton addTarget:self action:@selector(startStopDetectionsTapped:) forControlEvents:UIControlEventTouchUpInside];
             [pTableHeaderView addSubview:self.startstopButton];
+            
+            self.startstopTripButton = [[UIButton alloc]initWithFrame:CGRectMake(0, 40, self.view.frame.size.width, 40)];
+            [self.startstopTripButton setBackgroundColor:[UIColor colorWithRed:180.0/255.0 green:180.0/255.0 blue:180.0/255.0 alpha:1.0]];
+            [self.startstopTripButton setTitle:@"Start Trip" forState:UIControlStateNormal];
+            [self.startstopTripButton addTarget:self action:@selector(startStopTripTapped:) forControlEvents:UIControlEventTouchUpInside];
+            [pTableHeaderView addSubview:self.startstopTripButton];
+            
+            NSString *flavor = [SENTTransportDetectionSDK getSDKFlavor];
+            if ([flavor isEqualToString:@"triggered_trips"]) {
+            
+                [self.startstopButton setTitle:@"Start Detections (disabled)" forState:UIControlStateNormal];
+                
+                [self.startstopTripButton setBackgroundColor:[UIColor colorWithRed:255.0/255.0 green:43.0/255.0 blue:0.0/255.0 alpha:1.0]];
+                [self.startstopButton setBackgroundColor:[UIColor colorWithRed:180.0/255.0 green:180.0/255.0 blue:180.0/255.0 alpha:1.0]];
+                [self.startstopTripButton setUserInteractionEnabled:YES];
+                [self.startstopButton setUserInteractionEnabled:NO];
+            }
+            else {
+                [self.startstopTripButton setTitle:@"Start Trip (disabled)" forState:UIControlStateNormal];
+                
+                [self.startstopTripButton setBackgroundColor:[UIColor colorWithRed:180.0/255.0 green:180.0/255.0 blue:180.0/255.0 alpha:1.0]];
+                [self.startstopButton setBackgroundColor:[UIColor colorWithRed:255.0/255.0 green:43.0/255.0 blue:0.0/255.0 alpha:1.0]];
+                [self.startstopTripButton setUserInteractionEnabled:NO];
+                [self.startstopButton setUserInteractionEnabled:YES];
+            }
         }
     }
  
@@ -61,17 +86,39 @@
 - (IBAction)startStopDetectionsTapped:(id)sender {
     
     // Handling the start/stop detections events from user
-    if ([self.startstopButton.titleLabel.text isEqualToString:@"Start Detections"])
+    if ([self.startstopButton.titleLabel.text isEqualToString:@"Start Detections"]) {
         [((AppDelegate *)[[UIApplication sharedApplication] delegate]).sentianceSdk startDetections];
-    else
+        [self.startstopButton setTitle:@"Starting Detections ..." forState:UIControlStateNormal];
+    }
+    else if ([self.startstopButton.titleLabel.text isEqualToString:@"Stop Detections"]) {
         [((AppDelegate *)[[UIApplication sharedApplication] delegate]).sentianceSdk stopDetections];
+        [self.startstopButton setTitle:@"Stopping Detections ..." forState:UIControlStateNormal];
+    }
 }
 
+- (IBAction)startStopTripTapped:(id)sender {
+    
+    // Handling the start/stop detections events from user
+    if ([self.startstopTripButton.titleLabel.text isEqualToString:@"Start Trip"]) {
+        [((AppDelegate *)[[UIApplication sharedApplication] delegate]).sentianceSdk startTrip:@{}
+                                                                            transportModeHint:TransportMode_UNKNOWN
+                                                                                     callback:^(TripStatus tStatus, NSString *csMessage) {
+                                                                                         NSLog(@"%@", @"Trip status callback");
+                                                                                     }
+         ];
+        
+        [self.startstopTripButton setTitle:@"Starting Trip ..." forState:UIControlStateNormal];
+    }
+    else if ([self.startstopTripButton.titleLabel.text isEqualToString:@"Stop Trip"]) {
+        [((AppDelegate *)[[UIApplication sharedApplication] delegate]).sentianceSdk stopTrip];
+        [self.startstopTripButton setTitle:@"Stopping Trip ..." forState:UIControlStateNormal];
+    }
+}
 
 #pragma mark - UITableView delegates
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 40;
+    return 80;
 }
 
 - (nullable UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
@@ -142,12 +189,43 @@
     NSString* csDate = [formatter stringFromDate:lastWIFIDate];
     [sdkInfoData addObject:[NSString stringWithFormat:@"Last WIFI Access: %@", csDate != nil ? csDate : [NSString stringWithFormat:@"%llu", sdkStatus.wifiLastSeenTimestamp]]];
     
-    if (sdkStatus.isDetecting) {
+    if ([flavor isEqualToString:@"triggered_trips"]) {
         
-        [self.startstopButton setTitle:@"Stop Detections" forState:UIControlStateNormal];
+        if ([((AppDelegate *)[[UIApplication sharedApplication] delegate]).sentianceSdk isTripOngoing]) {
+            
+            [self.startstopTripButton setTitle:@"Stop Trip" forState:UIControlStateNormal];
+        }
+        else {
+            [self.startstopTripButton setTitle:@"Start Trip" forState:UIControlStateNormal];
+        }
     }
     else {
-        [self.startstopButton setTitle:@"Start Detections" forState:UIControlStateNormal];
+        
+        if (sdkStatus.isDetecting) {
+            
+            [self.startstopButton setTitle:@"Stop Detections" forState:UIControlStateNormal];
+        }
+        else {
+            [self.startstopButton setTitle:@"Start Detections" forState:UIControlStateNormal];
+        }
+    }
+    
+    if ([flavor isEqualToString:@"triggered_trips"]) {
+        
+        [self.startstopButton setTitle:@"Start Detections (disabled)" forState:UIControlStateNormal];
+        
+        [self.startstopTripButton setBackgroundColor:[UIColor colorWithRed:255.0/255.0 green:43.0/255.0 blue:0.0/255.0 alpha:1.0]];
+        [self.startstopButton setBackgroundColor:[UIColor colorWithRed:180.0/255.0 green:180.0/255.0 blue:180.0/255.0 alpha:1.0]];
+        [self.startstopTripButton setUserInteractionEnabled:YES];
+        [self.startstopButton setUserInteractionEnabled:NO];
+    }
+    else {
+        [self.startstopTripButton setTitle:@"Start Trip (disabled)" forState:UIControlStateNormal];
+        
+        [self.startstopTripButton setBackgroundColor:[UIColor colorWithRed:180.0/255.0 green:180.0/255.0 blue:180.0/255.0 alpha:1.0]];
+        [self.startstopButton setBackgroundColor:[UIColor colorWithRed:255.0/255.0 green:43.0/255.0 blue:0.0/255.0 alpha:1.0]];
+        [self.startstopTripButton setUserInteractionEnabled:NO];
+        [self.startstopButton setUserInteractionEnabled:YES];
     }
     
     [self.pInfoTableview reloadData];
