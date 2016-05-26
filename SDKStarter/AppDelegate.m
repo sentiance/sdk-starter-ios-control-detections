@@ -30,8 +30,8 @@
     // SDK configuration
     NSDictionary* config = @{
                              @"autostart":[NSNumber numberWithBool:AUTO_START_SDK],
-                             @"appid": @"569500efc36bd16b79000004",
-                             @"secret": @"d25effd62e3bda8f1e2dcf82b72681e99d0b875171821ed22ab3e156aa2a2d67eb9923c2f25590c82c117f19012ff816ac2984b71635a3b4b409d0815c00aff8",
+                             @"appid": @"YOUR_APP_ID",
+                             @"secret": @"YOUR_APP_SECRET",
                              @"appLaunchOptions": launchOptions == nil ? @{} : launchOptions
                              };
     
