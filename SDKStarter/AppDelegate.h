@@ -10,7 +10,8 @@
 
 #import <SENTTransportDetectionSDK/SENTTransportDetectionSDK.h>
 
-#define AUTO_START_SDK FALSE
+#define AUTO_START_DISABLED FALSE
+#define AUTO_START_SDK TRUE
 
 // The appdelegate confirms to SENTTransportDetectionSDKDelegate protocol
 @interface AppDelegate : UIResponder <UIApplicationDelegate, SENTTransportDetectionSDKDelegate>

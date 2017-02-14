@@ -29,7 +29,7 @@
 - (void) initializeSentianceSdk:(NSDictionary*) launchOptions {
     // SDK configuration
     NSDictionary* config = @{
-                             @"autostart":[NSNumber numberWithBool:AUTO_START_SDK],
+                             @"autostart":[NSNumber numberWithBool:AUTO_START_DISABLED],
                              @"appid": @"YOUR_APP_ID",
                              @"secret": @"YOUR_APP_SECRET",
                              @"appLaunchOptions": launchOptions == nil ? @{} : launchOptions
